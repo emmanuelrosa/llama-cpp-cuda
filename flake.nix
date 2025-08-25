@@ -13,5 +13,7 @@
       cudaSupport = true;
     };
 
+    packages.x86_64-linux.nvtop = nixpkgs.legacyPackages.x86_64-linux.nvtopPackages.nvidia;
+
   };
 }
