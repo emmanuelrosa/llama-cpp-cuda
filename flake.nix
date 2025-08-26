@@ -5,15 +5,20 @@
     nixpkgs.url = "github:nixos/nixpkgs/master";
   };
 
-  outputs = { self, nixpkgs }: {
+  outputs = { self, nixpkgs }: let
+    pkgs = import nixpkgs {
+      system = "x86_64-linux";
+      config.allowUnfree = true;
+    };
+  in {
 
     packages.x86_64-linux.default = self.packages.x86_64-linux.llama-cpp-cuda;
 
-    packages.x86_64-linux.llama-cpp-cuda = nixpkgs.legacyPackages.x86_64-linux.llama-cpp.override {
+    packages.x86_64-linux.llama-cpp-cuda = pkgs.llama-cpp.override {
       cudaSupport = true;
     };
 
-    packages.x86_64-linux.nvtop = nixpkgs.legacyPackages.x86_64-linux.nvtopPackages.nvidia;
+    packages.x86_64-linux.nvtop = pkgs.nvtopPackages.nvidia;
 
   };
 }
