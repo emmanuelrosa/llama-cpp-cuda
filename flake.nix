@@ -18,7 +18,7 @@
       cudaSupport = true;
     };
 
-    packages.x86_64-linux.nvtop = pkgs.nvtopPackages.nvidia;
+    packages.x86_64-linux.nvtop = pkgs.nvtopPackages.nvidia.override { amd = true;};
 
   };
 }
