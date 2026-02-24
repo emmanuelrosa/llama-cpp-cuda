@@ -6,19 +6,24 @@
   };
 
   outputs = { self, nixpkgs }: let
-    pkgs = import nixpkgs {
-      system = "x86_64-linux";
-      config.allowUnfree = true;
-    };
+    forAllSystems = func: nixpkgs.lib.genAttrs nixpkgs.lib.platforms.unix (system:
+      func (
+        import nixpkgs {
+          inherit system;
+          config.allowUnfree = true;
+        }
+      )
+      system
+    );
   in {
+    packages = forAllSystems (pkgs: system: {
+      default = self.packages.${system}.llama-cpp-cuda;
 
-    packages.x86_64-linux.default = self.packages.x86_64-linux.llama-cpp-cuda;
+      llama-cpp-cuda = pkgs.llama-cpp.override {
+        cudaSupport = true;
+      };
 
-    packages.x86_64-linux.llama-cpp-cuda = pkgs.llama-cpp.override {
-      cudaSupport = true;
-    };
-
-    packages.x86_64-linux.nvtop = pkgs.nvtopPackages.nvidia.override { amd = true;};
-
+      nvtop = pkgs.nvtopPackages.nvidia.override { amd = true;};
+    });
   };
 }
