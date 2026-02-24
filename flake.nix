@@ -3,10 +3,16 @@
 
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/master";
+    nix-appimage.url = "github:ralismark/nix-appimage";
+    nix-appimage.inputs.nixpkgs.follows = "nixpkgs";
   };
 
-  outputs = { self, nixpkgs }: let
-    forAllSystems = func: nixpkgs.lib.genAttrs nixpkgs.lib.platforms.unix (system:
+  outputs = { self, nixpkgs, nix-appimage }: let
+    forAllSystems = func: nixpkgs.lib.genAttrs [
+      "aarch64-linux"
+      "i686-linux"
+      "x86_64-linux"
+    ] (system:
       func (
         import nixpkgs {
           inherit system;
@@ -27,7 +33,10 @@
 
       llama-cpp-shell = pkgs.callPackage ./pkgs/llama-cpp-shell {
         llama-cpp = self.packages.${system}.llama-cpp-cuda;
+        nvidia_x11 = pkgs.linuxPackages.nvidia_x11;
       };
+
+      llama-cpp-shell-appimage = nix-appimage.bundlers."${system}".default self.packages."${system}".llama-cpp-shell;
     });
   };
 }
