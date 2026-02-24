@@ -24,6 +24,10 @@
       };
 
       nvtop = pkgs.nvtopPackages.nvidia.override { amd = true;};
+
+      llama-cpp-shell = pkgs.callPackage ./pkgs/llama-cpp-shell {
+        llama-cpp = self.packages.${system}.llama-cpp-cuda;
+      };
     });
   };
 }
